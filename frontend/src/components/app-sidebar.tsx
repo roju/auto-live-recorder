@@ -47,7 +47,7 @@ const data = {
         },
         {
           title: "Format",
-          url: "#",
+          url: "#/settings/demo",
         },
         {
           title: "Logging",

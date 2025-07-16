@@ -17,6 +17,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Demo from './Demo.tsx'
 import Dashboard from './Dashboard.tsx'
+import SettingsDemo from './screens/SettingsDemo.tsx'
+import Dashboard from './screens/Dashboard.tsx'
 
 const DynamicHashBreadcrumbs = () => {
   const location = useLocation();
@@ -52,8 +54,9 @@ const DynamicHashBreadcrumbs = () => {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/settings/general" element={<Demo />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/settings/general" element={<SettingsGeneral />} />
+      <Route path="/settings/demo" element={<SettingsDemo />} />
     </Routes>
   )
 }
