@@ -15,8 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
-import Demo from './Demo.tsx'
-import Dashboard from './Dashboard.tsx'
+import SettingsGeneral from './screens/SettingsGeneral.tsx'
 import SettingsDemo from './screens/SettingsDemo.tsx'
 import Dashboard from './screens/Dashboard.tsx'
 
@@ -64,7 +63,7 @@ function AppRoutes() {
 function App() {
   return (
     <HashRouter basename={"/"}>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>
