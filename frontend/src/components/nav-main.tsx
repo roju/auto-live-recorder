@@ -3,11 +3,9 @@ import {
 } from "lucide-react"
 
 import {
-  SidebarGroup,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 
 export function NavMain({
@@ -19,7 +17,6 @@ export function NavMain({
     icon: LucideIcon
   }[]
 }) {
-  // const { isMobile } = useSidebar()
 
   return (
     <SidebarMenu>
