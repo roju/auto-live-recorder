@@ -1,12 +1,7 @@
 import * as React from "react"
 import {
-  BookOpen,
-  Bot,
-  Frame,
-  Map,
-  PieChart,
+  Cookie,
   Settings2,
-  SquareTerminal,
   Video,
 } from "lucide-react"
 
@@ -33,6 +28,11 @@ const data = {
       title: "Dashboard",
       url: "#/dashboard",
       icon: Video,
+    },
+    {
+      title: "Cookies",
+      url: "#/cookies",
+      icon: Cookie,
     },
   ],
   navSettings: [
