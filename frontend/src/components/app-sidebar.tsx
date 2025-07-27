@@ -1,22 +1,25 @@
 import * as React from "react"
+// import { NavUser } from "@/components/nav-user"
+import {
+  Sidebar,
+  SidebarContent,
+  // SidebarFooter,
+  SidebarRail,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from "@/components/ui/sidebar"
 import {
   Cookie,
   Settings2,
   Video,
 } from "lucide-react"
+import { useLocation } from 'react-router-dom'
 
-import { NavSettings } from "@/components/nav-settings"
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarRail,
-  SidebarGroup
-} from "@/components/ui/sidebar"
-
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
@@ -46,8 +49,8 @@ const data = {
           url: "#/settings/general",
         },
         {
-          title: "Format",
-          url: "#/settings/demo",
+          title: "Files",
+          url: "#/settings/files",
         },
         {
           title: "Logging",
@@ -63,17 +66,61 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+  const location = useLocation();
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarContent>
         <SidebarGroup>
-          <NavMain items={data.navMain} />
-          <NavSettings items={data.navSettings} />
+          <SidebarMenu>
+            {data.navMain.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild
+                    className="cursor-default"
+                    tooltip={item.title}
+                    isActive = {location.pathname == item.url.substring(1)}
+                  >
+                      <a href={item.url}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </a>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+            {data.navSettings.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild
+                    className="cursor-default"
+                    tooltip={item.title}
+                  >
+                      <a href={item.url}>
+                        {item.icon && <item.icon />} 
+                        <span>{item.title}</span>
+                      </a>
+                  </SidebarMenuButton>
+                  <SidebarMenuSub>
+                    {item.items?.map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton asChild 
+                          className="cursor-default"
+                          isActive = {location.pathname == subItem.url.substring(1)}
+                        >
+                          <a href={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      {/* <SidebarFooter>
         <NavUser user={data.user} />
-      </SidebarFooter>
+      </SidebarFooter> */}
       <SidebarRail />
     </Sidebar>
   )
