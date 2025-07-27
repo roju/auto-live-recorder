@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { ThemeProvider } from "@/components/theme-provider"
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import SettingsGeneral from './screens/SettingsGeneral.tsx'
 import SettingsDemo from './screens/SettingsDemo.tsx'
 import Dashboard from './screens/Dashboard.tsx'
@@ -53,6 +53,7 @@ const DynamicHashBreadcrumbs = () => {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/settings/general" element={<SettingsGeneral />} />
       <Route path="/settings/demo" element={<SettingsDemo />} />
