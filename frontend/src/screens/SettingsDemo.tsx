@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-export function SettingsGeneral() {
+export function SettingsDemo() {
 
   return (
     <div className="flex justify-center">
@@ -45,4 +45,4 @@ export function SettingsGeneral() {
   )
 }
 
-export default SettingsGeneral
+export default SettingsDemo

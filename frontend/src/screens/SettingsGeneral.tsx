@@ -9,8 +9,7 @@ export function SettingsGeneral() {
   return (
     <div className="flex justify-center">
       <Card className="w-full mx-4">
-        <div className="flex">
-          <CardContent>
+          <CardContent className="flex">
             <div className="space-y-6">
 
               {/* Theme */}
@@ -21,7 +20,7 @@ export function SettingsGeneral() {
                   defaultValue={theme}
                 >
                   <SelectTrigger className="col-span-2">
-                    <SelectValue placeholder={theme.charAt(0).toUpperCase() + theme.slice(1)} />
+                    <SelectValue className="capitalize" placeholder={theme} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="light">Light</SelectItem>
@@ -34,10 +33,9 @@ export function SettingsGeneral() {
                   System will follow your OS preferences.
                 </p>
               </div>
-              
+
             </div>
           </CardContent>
-        </div>
       </Card>
     </div>
   )
