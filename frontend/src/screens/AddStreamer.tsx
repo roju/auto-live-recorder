@@ -38,12 +38,8 @@ import {
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { cn } from "@/lib/utils"
+import { cn, supportedPlatforms } from "@/lib/utils"
 import { ChooseDirectory } from '../../wailsjs/go/main/App';
-
-const supportedPlatforms = [
-    { label: "TikTok", value: "tiktok" },
-] as const
 
 const httpUrl = z.url({
   protocol: /^https?$/,

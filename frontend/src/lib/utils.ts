@@ -34,3 +34,7 @@ export function isValidDate(dateString: string): boolean {
   // isNaN(dateObject.getTime()) returns true if the date is invalid.
   return !isNaN(dateObject.getTime())
 }
+
+export const supportedPlatforms = [
+    { label: "TikTok", value: "tiktok" },
+] as const
