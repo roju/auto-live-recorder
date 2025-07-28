@@ -9,5 +9,10 @@
   "author": {
     "name": "roju",
     "email": "metabenic@gmail.com"
+  },
+  "bindings": {
+      "include": [
+          "main.App"
+      ]
   }
 }
