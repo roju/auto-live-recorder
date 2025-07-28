@@ -51,6 +51,7 @@ import { sample_data } from "@/data/sample-user-data"
 import { isValidDate, getShortRelativeTime } from "@/lib/utils"
 import RecordingTimer from "@/components/recording-timer"
 import AddStreamer from "./AddStreamer"
+import {BrowserOpenURL} from "../../wailsjs/runtime";
 
 function columnSortArrowIcon(sorted: false | SortDirection): React.ReactNode {
   if (!sorted) return <></>
@@ -116,7 +117,27 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
             row.original.botStatus === "paused" ? "text-muted-foreground" : ""
           }`}
         >
-          {row.getValue("username")}
+            {row.original.liveStatus === "live" ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+              <a
+                href="#"
+                onClick={e => {
+                  e.preventDefault()
+                  BrowserOpenURL(`https://www.tiktok.com/@${row.getValue("username")}/live`)
+                }}
+                className="underline text-primary hover:text-primary/80"
+              >
+                {row.getValue("username")}
+              </a>
+              </TooltipTrigger>
+              <TooltipContent>
+              Open in browser
+              </TooltipContent>
+            </Tooltip>
+            ) : (
+              row.getValue("username")
+            )}
         </p>
         {row.original.liveStatus === "live" && (
           <div className="flex justify-start">
