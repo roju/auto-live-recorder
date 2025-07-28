@@ -244,18 +244,7 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <div className="flex justify-end w-full !-ml-2">
-          {row.original.liveStatus === "live" && 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" className="h-8 w-10 p-0">
-                  <Eye className="!w-6 !h-6" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                Watch stream in video player
-              </TooltipContent>
-            </Tooltip>}
+        <div className="flex justify-end !-ml-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-10 p-0">
@@ -264,6 +253,20 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {row.original.liveStatus === "live" && 
+                <DropdownMenuItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-2">
+                        <Eye /><span>Watch stream</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Open live stream in video player
+                    </TooltipContent>
+                  </Tooltip>
+                </DropdownMenuItem>
+              }
               <DropdownMenuItem>
                 <FileVideo/><span>Show VODs</span>
               </DropdownMenuItem>
@@ -274,7 +277,7 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
                 {row.original.botStatus === "paused" ? (
                     <>< Play/><span>Resume</span></>
                 ) : (
-                  <>< Pause/><span>Pause</span></>
+                    <>< Pause/><span>Pause</span></>
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem variant="destructive">
