@@ -105,13 +105,17 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <Avatar>
+        <Avatar className={row.original.botStatus === "paused" ? "opacity-40" : ""}>
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>{
             ((s: string) => s ? s.slice(0, 2).toUpperCase() : '')(row.getValue("username"))}
           </AvatarFallback>
         </Avatar>
-        <p className="max-w-40 overflow-hidden text-ellipsis">
+        <p
+          className={`max-w-40 overflow-hidden text-ellipsis ${
+            row.original.botStatus === "paused" ? "text-muted-foreground" : ""
+          }`}
+        >
           {row.getValue("username")}
         </p>
         {row.original.liveStatus === "live" && (
@@ -150,7 +154,9 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
           </div>
         </div>
         :
-        <div className="capitalize">{row.getValue("botStatus")}</div>
+        <div className={`capitalize ${row.getValue("botStatus") === "paused" ? "text-muted-foreground" : ""}`}>
+          {row.getValue("botStatus")}
+        </div>
     ),
   },
   {
