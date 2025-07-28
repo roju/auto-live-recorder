@@ -25,8 +25,8 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:             "auto-live-recorder",
-		Width:             800,
-		Height:            600,
+		Width:             900,
+		Height:            665,
 		MinWidth:          600,
 		MinHeight:         500,
 		DisableResize:     false,
