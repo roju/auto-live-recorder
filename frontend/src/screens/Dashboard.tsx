@@ -48,7 +48,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { SocialMediaUser } from "@/types/app-types"
 import { sample_data } from "@/data/sample-user-data"
-import { isValidDate, getShortRelativeTime } from "@/lib/utils"
+import { isValidDate, getShortRelativeTime, getLiveURL } from "@/lib/utils"
 import RecordingTimer from "@/components/recording-timer"
 import AddStreamer from "./AddStreamer"
 import {BrowserOpenURL} from "../../wailsjs/runtime";
@@ -124,7 +124,7 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
                 href="#"
                 onClick={e => {
                   e.preventDefault()
-                  BrowserOpenURL(`https://www.tiktok.com/@${row.getValue("username")}/live`)
+                  BrowserOpenURL(getLiveURL(row.original.platform, row.getValue("username")))
                 }}
                 className="underline text-primary hover:text-primary/80"
               >

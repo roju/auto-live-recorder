@@ -38,3 +38,11 @@ export function isValidDate(dateString: string): boolean {
 export const supportedPlatforms = [
     { label: "TikTok", value: "tiktok" },
 ] as const
+
+export function getLiveURL(platform: string, username: string): string {
+  switch (platform) {
+    case "tiktok":
+      return `https://www.tiktok.com/@${username}/live`
+    default: return ''
+  }
+}
