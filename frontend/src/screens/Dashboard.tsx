@@ -7,21 +7,20 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  SortDirection,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
-
+import { ArrowUp, ArrowDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -33,137 +32,263 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { 
+  Eye,
+  Trash2,
+  Pause,
+  ScrollText,
+  FileVideo,
+  Play,
+} from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { SocialMediaUser } from "@/types/app-types"
+import { sample_data } from "@/data/sample-user-data"
+import { isValidDate, getShortRelativeTime } from "@/lib/utils"
+import RecordingTimer from "@/components/recording-timer"
+import AddStreamer from "./AddStreamer"
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
-  },
-]
-
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
+function columnSortArrowIcon(sorted: false | SortDirection): React.ReactNode {
+  if (!sorted) return <></>
+  return sorted === "asc" 
+    ? <ArrowUp className="-ml-2 -mr-1"/> 
+    : <ArrowDown className="-ml-2 -mr-1"/>
 }
 
-export const columns: ColumnDef<Payment>[] = [
+/*
+ ██████  ██████  ██      ██    ██ ███    ███ ███    ██ ███████
+██      ██    ██ ██      ██    ██ ████  ████ ████   ██ ██
+██      ██    ██ ██      ██    ██ ██ ████ ██ ██ ██  ██ ███████
+██      ██    ██ ██      ██    ██ ██  ██  ██ ██  ██ ██      ██
+ ██████  ██████  ███████  ██████  ██      ██ ██   ████ ███████
+
+
+*/
+
+export const columns: ColumnDef<SocialMediaUser>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
+    accessorKey: "platform",
     header: ({ column }) => {
       return (
         <Button
+          className="!px-1 !ml-1"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
-          <ArrowUpDown />
+          Platform
+          {columnSortArrowIcon(column.getIsSorted())}
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => (
+      <div>{row.getValue("platform")}</div>
+    ),
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
+    accessorKey: "username",
+    enableHiding: false,
+    header: ({ column }) => {
+      return (
+        <Button
+          className="!px-1 !ml-1"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Streamer
+          {columnSortArrowIcon(column.getIsSorted())}
+        </Button>
+      )
     },
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>{
+            ((s: string) => s ? s.slice(0, 2).toUpperCase() : '')(row.getValue("username"))}
+          </AvatarFallback>
+        </Avatar>
+        <p className="max-w-40 overflow-hidden text-ellipsis">
+          {row.getValue("username")}
+        </p>
+        {row.original.liveStatus === "live" && (
+          <div className="flex justify-start">
+            <Badge variant="destructive">Live</Badge>
+          </div>
+        )}
+      </div>
+    )
+  },
+  {
+    accessorKey: "botStatus",
+    enableHiding: false,
+    header: ({ column }) => {
+      return (
+        <Button
+          className="!px-1 !ml-1"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          {columnSortArrowIcon(column.getIsSorted())}
+        </Button>
+      )
+    },
+    cell: ({ row }) => (
+      row.getValue("botStatus") === "recording" ?
+        <div>
+          {"Recording "}
+          <div className="inline-flex w-15">
+            <Badge variant="outline">
+              <div className="inline-block italic text-muted-foreground">
+                <RecordingTimer startTimeISO={row.original.lastLive} />
+              </div>
+            </Badge>
+          </div>
+        </div>
+        :
+        <div className="capitalize">{row.getValue("botStatus")}</div>
+    ),
+  },
+  {
+    accessorKey: "lastLive",
+    cell: ({ row }) => (
+      row.original.liveStatus === "live" ? "" : (
+        isValidDate(row.getValue("lastLive")) ?
+          getShortRelativeTime(row.getValue("lastLive")) : ""
+      )
+    ),
+    header: ({ column }) => {
+      return (
+        <Button
+          className="!px-1 !ml-1"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Last Live
+          {columnSortArrowIcon(column.getIsSorted())}
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "vods",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="!px-1 !ml-1"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          VODs
+          {columnSortArrowIcon(column.getIsSorted())}
+        </Button>
+      )
+    },
+    cell: ({ row }) => (
+      row.getValue("vods") === 0 ? 
+        <div className="text-muted-foreground">None</div>
+        :
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8">
+              {row.getValue("vods")}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            Show VODs
+          </TooltipContent>
+        </Tooltip>
+    ),
+  },
+  {
+    accessorKey: "autoRecord",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="!px-1 !ml-1"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Auto Rec
+          {columnSortArrowIcon(column.getIsSorted())}
+        </Button>
+      )
+    },
+    cell: ({ row }) => (
+      <div className="w-15">
+        <div className="flex justify-center">
+          <Switch
+            disabled={row.getValue("botStatus") === "paused"}
+            checked={
+              row.getValue("botStatus") === "paused" ? false 
+              : row.getValue("autoRecord")
+            }
+            onCheckedChange={checked => {console.log(checked)}}
+          />
+        </div>
+      </div>
+    ),
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
-
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex justify-end w-full !-ml-2">
+          {row.original.liveStatus === "live" && 
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" className="h-8 w-10 p-0">
+                  <Eye className="!w-6 !h-6" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                Watch stream in video player
+              </TooltipContent>
+            </Tooltip>}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-10 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <FileVideo/><span>Show VODs</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                < ScrollText/><span>Show logs</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                {row.original.botStatus === "paused" ? (
+                    <>< Play/><span>Resume</span></>
+                ) : (
+                  <>< Pause/><span>Pause</span></>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive">
+                <Trash2/><span>Remove</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       )
     },
   },
 ]
+/*
+ ██████  ██████  ███    ███ ██████   ██████  ███    ██ ███████ ███    ██ ████████
+██      ██    ██ ████  ████ ██   ██ ██    ██ ████   ██ ██      ████   ██    ██
+██      ██    ██ ██ ████ ██ ██████  ██    ██ ██ ██  ██ █████   ██ ██  ██    ██
+██      ██    ██ ██  ██  ██ ██      ██    ██ ██  ██ ██ ██      ██  ██ ██    ██
+ ██████  ██████  ██      ██ ██       ██████  ██   ████ ███████ ██   ████    ██
+*/
+
 
 function Dashboard() {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -171,11 +296,12 @@ function Dashboard() {
     []
   )
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+    React.useState<VisibilityState>({
+      platform: false, // Hide platform column by default
+    })
 
-  const table = useReactTable({
-    data,
+  const table = useReactTable<SocialMediaUser>({
+    data: sample_data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -184,53 +310,105 @@ function Dashboard() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
+    },
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 8,
+      },
     },
   })
+
+  const currentPage = table.getState().pagination.pageIndex + 1;
+  const totalPages = table.getPageCount();
+
+  function readableUserProp(columnId: string) : string {
+    switch(columnId) {
+      case 'vods': return 'VODs';
+      case 'lastLive': return 'Last Live';
+      case 'autoRecord': return 'Auto Rec';
+      default: return columnId;
+    }
+  }
+
+/*
+ ██████  ██████  ███    ██ ████████ ██████   ██████  ██      ███████
+██      ██    ██ ████   ██    ██    ██   ██ ██    ██ ██      ██
+██      ██    ██ ██ ██  ██    ██    ██████  ██    ██ ██      ███████
+██      ██    ██ ██  ██ ██    ██    ██   ██ ██    ██ ██           ██
+ ██████  ██████  ██   ████    ██    ██   ██  ██████  ███████ ███████
+*/
 
   return (
     <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter users"
+          value={(table.getColumn("username")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("username")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-50"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center space-x-2 ml-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                      {readableUserProp(column.id)}
+                      </DropdownMenuCheckboxItem>
+                  )
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Actions <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem className="ml-auto">
+                < Pause/><span>Pause All</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="ml-auto">
+                < Play/><span>Resume All</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" className="ml-auto">
+                < Trash2/><span>Remove All</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <AddStreamer />
+        </div>
       </div>
+{/*
+████████  █████  ██████  ██      ███████
+   ██    ██   ██ ██   ██ ██      ██
+   ██    ███████ ██████  ██      █████
+   ██    ██   ██ ██   ██ ██      ██
+   ██    ██   ██ ██████  ███████ ███████
+*/}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -238,7 +416,7 @@ function Dashboard() {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="!px-0">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -254,10 +432,7 @@ function Dashboard() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
@@ -281,10 +456,16 @@ function Dashboard() {
           </TableBody>
         </Table>
       </div>
+{/*
+██████   █████   ██████  ███████ ███████
+██   ██ ██   ██ ██       ██      ██
+██████  ███████ ██   ███ █████   ███████
+██      ██   ██ ██    ██ ██           ██
+██      ██   ██  ██████  ███████ ███████
+*/}
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+            {currentPage} / {totalPages}
         </div>
         <div className="space-x-2">
           <Button
