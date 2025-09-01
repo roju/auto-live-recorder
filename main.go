@@ -1,8 +1,9 @@
 package main
 
 import (
+	"context"
 	"embed"
-	"log"
+	"log/slog"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -21,6 +22,7 @@ var icon []byte
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
+	prefs := NewPreferenceService()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -41,13 +43,18 @@ func main() {
 		Menu:             nil,
 		Logger:           nil,
 		LogLevel:         logger.DEBUG,
-		OnStartup:        app.startup,
 		OnDomReady:       app.domReady,
 		OnBeforeClose:    app.beforeClose,
 		OnShutdown:       app.shutdown,
 		WindowStartState: options.Normal,
+
+		OnStartup: func(ctx context.Context) {
+			app.startup(ctx)
+			prefs.startup()
+		},
 		Bind: []interface{}{
 			app,
+			prefs,
 		},
 		// Windows platform specific options
 		Windows: &windows.Options{
@@ -80,6 +87,6 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Application error", slog.Any("error", err))
 	}
 }
