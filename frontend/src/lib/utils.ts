@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { StreamingPlatform } from "@/types/app-types"
+import { platformMap } from "../data/supported-platforms"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -35,14 +37,8 @@ export function isValidDate(dateString: string): boolean {
   return !isNaN(dateObject.getTime())
 }
 
-export const supportedPlatforms = [
-    { label: "TikTok", value: "tiktok" },
-] as const
-
-export function getLiveURL(platform: string, username: string): string {
-  switch (platform) {
-    case "tiktok":
-      return `https://www.tiktok.com/@${username}/live`
-    default: return ''
-  }
+export function extractPlatformFromUrl(url: string): StreamingPlatform | null {
+  const match = url.match(/^https?:\/\/(?:www\.)?([^./]+)\.[^/]+/);
+  const platform = match?.[1];
+  return platform ? platformMap.get(platform) || null : null;
 }
