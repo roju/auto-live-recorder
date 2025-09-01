@@ -13,57 +13,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import {
-  Cookie,
-  Settings2,
-  Video,
-} from "lucide-react"
 import { useLocation } from 'react-router-dom'
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#/dashboard",
-      icon: Video,
-    },
-    {
-      title: "Cookies",
-      url: "#/cookies",
-      icon: Cookie,
-    },
-  ],
-  navSettings: [
-    {
-      title: "Settings",
-      url: "#/settings/general",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#/settings/general",
-        },
-        {
-          title: "Files",
-          url: "#/settings/files",
-        },
-        {
-          title: "Logging",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ]
-}
+import { sidebarItems } from "@/data/sidebar-items";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
@@ -74,7 +25,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {data.navMain.map((item) => (
+            {sidebarItems.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild
                     className="cursor-default"
@@ -88,7 +39,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-            {data.navSettings.map((item) => (
+            {sidebarItems.navSettings.map((item) => (
               <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild
                     className="cursor-default"
