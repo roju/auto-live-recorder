@@ -80,6 +80,7 @@ function columnSortArrowIcon(sorted: false | SortDirection): React.ReactNode {
 
 export const columns: ColumnDef<Streamer>[] = [
   {
+    id: "platform",
     accessorKey: "platform",
     header: ({ column }) => {
       return (
@@ -98,6 +99,7 @@ export const columns: ColumnDef<Streamer>[] = [
     ),
   },
   {
+    id: "username",
     accessorKey: "username",
     enableHiding: false,
     header: ({ column }) => {
@@ -158,6 +160,7 @@ export const columns: ColumnDef<Streamer>[] = [
     )
   },
   {
+    id: "bot_status",
     accessorKey: "botStatus",
     enableHiding: false,
     header: ({ column }) => {
@@ -173,7 +176,7 @@ export const columns: ColumnDef<Streamer>[] = [
       )
     },
     cell: ({ row }) => (
-      row.getValue("botStatus") === "recording" ?
+      row.getValue("bot_status") === "recording" ?
         <div>
           {"Recording "}
           <div className="inline-flex w-15">
@@ -185,17 +188,18 @@ export const columns: ColumnDef<Streamer>[] = [
           </div>
         </div>
         :
-        <div className={`capitalize ${row.getValue("botStatus") === "paused" ? "text-muted-foreground" : ""}`}>
-          {row.getValue("botStatus")}
+        <div className={`capitalize ${row.getValue("bot_status") === "paused" ? "text-muted-foreground" : ""}`}>
+          {row.getValue("bot_status")}
         </div>
     ),
   },
   {
+    id: "last_live",
     accessorKey: "lastLive",
     cell: ({ row }) => (
       row.original.liveStatus === "live" ? "" : (
-        isValidDate(row.getValue("lastLive")) ?
-          getShortRelativeTime(row.getValue("lastLive")) : ""
+        isValidDate(row.getValue("last_live")) ?
+          getShortRelativeTime(row.getValue("last_live")) : ""
       )
     ),
     header: ({ column }) => {
@@ -212,6 +216,7 @@ export const columns: ColumnDef<Streamer>[] = [
     },
   },
   {
+    id: "vods",
     accessorKey: "vods",
     header: ({ column }) => {
       return (
@@ -242,6 +247,7 @@ export const columns: ColumnDef<Streamer>[] = [
     ),
   },
   {
+    id: "auto_record",
     accessorKey: "autoRecord",
     header: ({ column }) => {
       return (
@@ -259,10 +265,10 @@ export const columns: ColumnDef<Streamer>[] = [
       <div className="w-15">
         <div className="flex justify-center">
           <Switch
-            disabled={row.getValue("botStatus") === "paused"}
+            disabled={row.getValue("bot_status") === "paused"}
             checked={
-              row.getValue("botStatus") === "paused" ? false 
-              : row.getValue("autoRecord")
+              row.getValue("bot_status") === "paused" ? false 
+              : row.getValue("auto_record")
             }
             onCheckedChange={checked => {console.log(checked)}}
           />
@@ -368,11 +374,11 @@ function Dashboard() {
   const currentPage = table.getState().pagination.pageIndex + 1;
   const totalPages = table.getPageCount();
 
-  function readableUserProp(columnId: string) : string {
+  function columnTitleForId(columnId: string) : string {
     switch(columnId) {
       case 'vods': return 'VODs';
-      case 'lastLive': return 'Last Live';
-      case 'autoRecord': return 'Auto Rec';
+      case 'last_live': return 'Last Live';
+      case 'auto_record': return 'Auto Rec';
       default: return columnId;
     }
   }
@@ -417,7 +423,7 @@ function Dashboard() {
                           column.toggleVisibility(!!value)
                         }
                       >
-                      {readableUserProp(column.id)}
+                      {columnTitleForId(column.id)}
                       </DropdownMenuCheckboxItem>
                   )
                 })}
