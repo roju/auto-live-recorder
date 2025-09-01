@@ -38,6 +38,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { 
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog"
+import { 
   Eye,
   Trash2,
   Pause,
@@ -52,6 +62,7 @@ import { isValidDate, getShortRelativeTime, getLiveURL } from "@/lib/utils"
 import RecordingTimer from "@/components/recording-timer"
 import AddStreamer from "./AddStreamer"
 import {BrowserOpenURL} from "../../wailsjs/runtime";
+import { appStore } from "../state/app-state";
 
 function columnSortArrowIcon(sorted: false | SortDirection): React.ReactNode {
   if (!sorted) return <></>
@@ -321,17 +332,19 @@ export const columns: ColumnDef<SocialMediaUser>[] = [
 
 
 function Dashboard() {
+  const [confirmRemoveAllOpen, setConfirmRemoveAllOpen] = React.useState(false)
+  const [actionsMenuOpen, setActionsMenuOpen] = React.useState(false)
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({
-      platform: false, // Hide platform column by default
-    })
-
-  const table = useReactTable<SocialMediaUser>({
-    data: sample_data,
+  const removeAllStreamers = appStore((state) => state.removeAllStreamers)
+  function handleRemoveAllClicked() {
+    // Close actions menu before opening dialog to avoid menu remaining open/overlaying UI
+    setActionsMenuOpen(false)
+    if (streamerList.length > 1) {
+      setConfirmRemoveAllOpen(true)
+    } else {
+      removeAllStreamers()
+    }
+  }
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -411,7 +424,7 @@ function Dashboard() {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <DropdownMenu>
+          <DropdownMenu open={actionsMenuOpen} onOpenChange={setActionsMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
                 Actions <ChevronDown />
@@ -424,14 +437,40 @@ function Dashboard() {
               <DropdownMenuItem className="ml-auto">
                 < Play/><span>Resume All</span>
               </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" className="ml-auto">
-                < Trash2/><span>Remove All</span>
+              <DropdownMenuItem
+                variant="destructive"
+                className="ml-auto"
+                onClick={() => handleRemoveAllClicked()}
+              >
+                <Trash2/><span>Remove All</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <AddStreamer />
-        </div>
-      </div>
+          {/* Confirmation dialog for Remove All */}
+          <AlertDialog open={confirmRemoveAllOpen} onOpenChange={setConfirmRemoveAllOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Remove all streamers?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will remove {streamerList.length} streamer{streamerList.length === 1 ? "" : "s"}.
+                  Are you sure?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => {
+                  // ensure actions menu closed and dialog closed after removal
+                  removeAllStreamers().then(() => {
+                    setActionsMenuOpen(false)
+                    setConfirmRemoveAllOpen(false)
+                  })
+                }} className="bg-destructive">
+                  Yes, remove all
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 {/*
 ████████  █████  ██████  ██      ███████
    ██    ██   ██ ██   ██ ██      ██
