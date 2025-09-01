@@ -95,7 +95,7 @@ export const columns: ColumnDef<Streamer>[] = [
       )
     },
     cell: ({ row }) => (
-      <div>{row.getValue("platform")}</div>
+      <div>{row.original.platform.displayName}</div>
     ),
   },
   {
