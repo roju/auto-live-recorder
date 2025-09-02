@@ -38,8 +38,8 @@ import {
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { cn, supportedPlatforms } from "@/lib/utils"
-import { ChooseDirectory } from '../../wailsjs/go/main/App';
+import { supportedPlatforms, platformMap } from "@/data/supported-platforms"
+import { Streamer, StreamingPlatform } from "@/types/app-types";
 
 const httpUrl = z.url({
   protocol: /^https?$/,
@@ -48,7 +48,7 @@ const httpUrl = z.url({
 
 const FormSchema = z.object({
     liveURL: httpUrl.optional().or(z.literal('')),
-    platform: z.string(),
+    platform: z.custom<StreamingPlatform>(),
     username: z.string().min(1).max(32),
     folder: z.string(),
     autorecord: z.boolean()
@@ -168,9 +168,7 @@ export function AddStreamer() {
                                                     )}
                                                 >
                                                     {field.value
-                                                        ? supportedPlatforms.find(
-                                                            (platform) => platform.value === field.value
-                                                        )?.label
+                                                        ? field.value?.displayName 
                                                         : "Select platform"}
                                                     <ChevronsUpDown className="opacity-50" />
                                                 </Button>
@@ -187,17 +185,17 @@ export function AddStreamer() {
                                                     <CommandGroup>
                                                         {supportedPlatforms.map((platform) => (
                                                             <CommandItem
-                                                                value={platform.label}
-                                                                key={platform.value}
+                                                                value={platform.displayName}
+                                                                key={platform.name}
                                                                 onSelect={() => {
-                                                                    form.setValue("platform", platform.value)
+                                                                    form.setValue("platform", platform)
                                                                 }}
                                                             >
-                                                                {platform.label}
+                                                                {platform.displayName}
                                                                 <Check
                                                                     className={cn(
                                                                         "ml-auto",
-                                                                        platform.value === field.value
+                                                                        platform.name === field.value.name
                                                                             ? "opacity-100"
                                                                             : "opacity-0"
                                                                     )}
