@@ -273,10 +273,11 @@ export function AddStreamer() {
                                         </Button>
                                     </FormControl>
                                     <div className="col-span-1" />
-                                    <FormDescription className="col-span-2">
-                                        {/* Folder where streamer's VODs will be saved */}
+                                    <div className="col-span-1" />
+                                    <div className="col-span-2 text-sm text-muted-foreground break-words">
+                                        {/* {`Changing this folder will override the default folder and template set in Settings > Files`} */}
                                         <FormMessage/>
-                                    </FormDescription>
+                                    </div>
                                     {/* Hidden input to preserve form integration */}
                                     <Input type="hidden" {...field} />
                                 </FormItem>
