@@ -364,6 +364,7 @@ function Dashboard() {
   const hydrateDashboardColumnVis = appStore((state) => state.hydrateDashboardColumnVis)
   const persistDashboardColumnVis = appStore((state) => state.persistDashboardColumnVis)
   const removeAllStreamers = appStore((state) => state.removeAllStreamers)
+  const updateAllStreamers = appStore((state) => state.updateAllStreamers)
 
   React.useEffect(() => {
     hydrateDashboardColumnVis().then(() => setColumnVisibility(dashboardColumnVis))
@@ -379,6 +380,27 @@ function Dashboard() {
       removeAllStreamers()
     }
   }
+
+  function handlePauseAllClicked() {
+    const updates = streamerList
+      .filter(streamer => streamer.botStatus !== "paused")
+      .map(streamer => ({ streamer, changes: { botStatus: "paused" as const } }))
+    
+    if (streamerList.length > 0) {
+      updateAllStreamers(updates)
+    }
+  }
+
+  function handleResumeAllClicked() {
+    const updates = streamerList
+      .filter(streamer => streamer.botStatus === "paused")
+      .map(streamer => ({ streamer, changes: { botStatus: "monitoring" as const } }))
+    
+    if (updates.length > 0) {
+      updateAllStreamers(updates)
+    }
+  }
+
   const table = useReactTable<Streamer>({
     data: streamerList,
     columns,
@@ -471,11 +493,17 @@ function Dashboard() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem className="ml-auto">
-                < Pause/><span>Pause All</span>
+              <DropdownMenuItem
+                className="ml-auto"
+                onClick={() => handlePauseAllClicked()}
+              >
+                <Pause/><span>Pause All</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="ml-auto">
-                < Play/><span>Resume All</span>
+              <DropdownMenuItem
+                className="ml-auto"
+                onClick={() => handleResumeAllClicked()}
+              >
+                <Play/><span>Resume All</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 variant="destructive"
