@@ -340,6 +340,7 @@ function Dashboard() {
   const [confirmRemoveAllOpen, setConfirmRemoveAllOpen] = React.useState(false)
   const [actionsMenuOpen, setActionsMenuOpen] = React.useState(false)
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const streamerList = appStore((state) => state.streamerList)
   const removeAllStreamers = appStore((state) => state.removeAllStreamers)
   function handleRemoveAllClicked() {
     // Close actions menu before opening dialog to avoid menu remaining open/overlaying UI
@@ -350,6 +351,8 @@ function Dashboard() {
       removeAllStreamers()
     }
   }
+  const table = useReactTable<Streamer>({
+    data: streamerList,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
