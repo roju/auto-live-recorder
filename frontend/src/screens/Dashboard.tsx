@@ -318,7 +318,13 @@ export const columns: ColumnDef<Streamer>[] = [
                     <>< Pause/><span>Pause</span></>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => {
+                  console.log("Removing streamer:", row.original.streamerId);
+                  appStore.getState().removeStreamer(row.original.streamerId)
+                }}
+              >
                 <Trash2/><span>Remove</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
