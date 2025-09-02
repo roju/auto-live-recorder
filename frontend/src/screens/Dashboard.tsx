@@ -62,6 +62,7 @@ import RecordingTimer from "@/components/recording-timer"
 import AddStreamer from "./AddStreamer"
 import {BrowserOpenURL} from "../../wailsjs/runtime";
 import { appStore } from "../state/app-state";
+import { DEFAULT_COLUMN_VIS } from "../state/prefs.ts"
 
 /*
  ██████  ██████  ██      ██    ██ ███    ███ ███    ██ ███████
@@ -340,8 +341,16 @@ function Dashboard() {
   const [confirmRemoveAllOpen, setConfirmRemoveAllOpen] = React.useState(false)
   const [actionsMenuOpen, setActionsMenuOpen] = React.useState(false)
   const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = 
+    React.useState<VisibilityState>(DEFAULT_COLUMN_VIS)
   const streamerList = appStore((state) => state.streamerList)
+  const dashboardColumnVis = appStore((state) => state.dashboardColumnVis)
+  const dashboardColumnVisHydrated = appStore((state) => state.dashboardColumnVisHydrated)
+  const hydrateDashboardColumnVis = appStore((state) => state.hydrateDashboardColumnVis)
+  const persistDashboardColumnVis = appStore((state) => state.persistDashboardColumnVis)
   const removeAllStreamers = appStore((state) => state.removeAllStreamers)
+    hydrateDashboardColumnVis().then(() => setColumnVisibility(dashboardColumnVis))
   function handleRemoveAllClicked() {
     // Close actions menu before opening dialog to avoid menu remaining open/overlaying UI
     setActionsMenuOpen(false)
@@ -360,7 +369,11 @@ function Dashboard() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+    onColumnVisibilityChange: (updater) => {
+      const nextState = (updater as any)(columnVisibility)
+      setColumnVisibility(nextState)
+      persistDashboardColumnVis(nextState)
+    },
     state: {
       sorting,
       columnFilters,
@@ -489,51 +502,53 @@ function Dashboard() {
    ██    ██   ██ ██████  ███████ ███████
 */}
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="!px-0">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+        {dashboardColumnVisHydrated && (
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id} className="!px-0">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={`${row.original.platform.displayName}${row.original.username}`}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No streamers
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </div>
 {/*
 ██████   █████   ██████  ███████ ███████
