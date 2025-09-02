@@ -5,6 +5,7 @@ dist
 dist-ssr
 *.local
 package.json.md5
+auto-live-recorder
 
 # Logs
 logs
