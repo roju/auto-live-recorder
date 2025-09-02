@@ -256,7 +256,7 @@ export function AddStreamer() {
                             name="folder"
                             render={({ field }) => (
                                 <FormItem className="grid grid-cols-3 items-center gap-x-4 gap-y-2">
-                                    <FormLabel className="text-right">Download folder</FormLabel>
+                                    <FormLabel className="text-right">VOD folder</FormLabel>
                                     <p className="col-span-2 text-sm text-muted-foreground break-words">
                                         {/* ~/Downloads/auto-live-recorder */}
                                         {field.value || "No folder selected"}
