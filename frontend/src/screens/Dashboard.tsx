@@ -347,10 +347,16 @@ function Dashboard() {
   const streamerList = appStore((state) => state.streamerList)
   const dashboardColumnVis = appStore((state) => state.dashboardColumnVis)
   const dashboardColumnVisHydrated = appStore((state) => state.dashboardColumnVisHydrated)
+  const hydrateStreamerList = appStore((state) => state.hydrateStreamerList)
   const hydrateDashboardColumnVis = appStore((state) => state.hydrateDashboardColumnVis)
   const persistDashboardColumnVis = appStore((state) => state.persistDashboardColumnVis)
   const removeAllStreamers = appStore((state) => state.removeAllStreamers)
+
+  React.useEffect(() => {
     hydrateDashboardColumnVis().then(() => setColumnVisibility(dashboardColumnVis))
+    hydrateStreamerList()
+  }, [])
+ 
   function handleRemoveAllClicked() {
     // Close actions menu before opening dialog to avoid menu remaining open/overlaying UI
     setActionsMenuOpen(false)
