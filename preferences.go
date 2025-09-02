@@ -66,6 +66,7 @@ func NewPreferenceService() *PreferenceService {
 
 func (p *PreferenceService) startup() {
 	p.userConfigPath = getUserConfigPath("AutoLiveRecorder")
+	slog.Info("User config path", "path", p.userConfigPath)
 	downloadsDir := xdg.UserDirs.Download
 	if downloadsDir == "" {
 		slog.Error("Could not determine the Downloads folder")
