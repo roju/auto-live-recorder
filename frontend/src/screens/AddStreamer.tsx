@@ -263,14 +263,16 @@ export function AddStreamer() {
                                     </p>
                                     <div className="col-span-1"/>
                                     <FormControl>
-                                        <Button 
-                                            type="button" 
-                                            variant="outline" 
-                                            onClick={handleChooseDirectory} 
-                                            className="col-span-2"
-                                        >
-                                                <Folder/><span>Choose Folder</span>
-                                        </Button>
+                                        <div className="w-fit">
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                onClick={handleChooseDirectory} 
+                                                className="col-span-2"
+                                            >
+                                                    <Folder/><span>Change Folder</span>
+                                            </Button>
+                                        </div>
                                     </FormControl>
                                     <div className="col-span-1" />
                                     <div className="col-span-1" />
