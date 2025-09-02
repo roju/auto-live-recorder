@@ -313,7 +313,12 @@ export const columns: ColumnDef<Streamer>[] = [
               <DropdownMenuItem>
                 < ScrollText/><span>Show logs</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const botStatus = row.original.botStatus === "paused" ? "monitoring" : "paused"
+                  appStore.getState().updateStreamer(row.original, { botStatus })
+                }}
+              >
                 {row.original.botStatus === "paused" ? (
                     <>< Play/><span>Resume</span></>
                 ) : (
