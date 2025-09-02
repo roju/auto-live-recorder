@@ -271,7 +271,9 @@ export const columns: ColumnDef<Streamer>[] = [
               row.getValue("bot_status") === "paused" ? false 
               : row.getValue("auto_record")
             }
-            onCheckedChange={checked => {console.log(checked)}}
+            onCheckedChange={autoRecord => {
+              appStore.getState().updateStreamer(row.original, { autoRecord })
+            }}
           />
         </div>
       </div>
