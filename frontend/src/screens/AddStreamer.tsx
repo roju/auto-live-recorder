@@ -73,6 +73,8 @@ export function AddStreamer() {
         // Remove the filename from the template to get the directory
         .replace(/\/+$/, "")
     )
+	// Control dialog open state so we can programmatically close it after adding a streamer
+	const [open, setOpen] = useState(false);
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
         console.log("AddStreamer form submit: ", JSON.stringify(data, null, 2))
@@ -87,6 +89,9 @@ export function AddStreamer() {
             data.autorecord,
             data.folder
         ))
+        // Close dialog after adding streamer
+        setOpen(false)
+        form.reset()
     }
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -115,9 +120,17 @@ export function AddStreamer() {
     }
 
     function HandleDialogOpenChange(open: boolean) {
+        console.log("Dialog open state changed:", open)
         if (open) {
-            form.reset()
-            form.setValue("platform", "tiktok")
+            const defaultPlatform = platformMap.get("tiktok")!
+
+            form.reset({
+                autorecord: true,
+                username: "",
+                liveURL: "",
+                platform: defaultPlatform,
+                folder: vodFolderPath(vodFolderTemplate, defaultPlatform, ""),
+            });
         }
     }
 
@@ -194,7 +207,13 @@ export function AddStreamer() {
 */
 
     return (
-        <Dialog onOpenChange={HandleDialogOpenChange}>
+        <Dialog 
+            open={open} 
+            onOpenChange={(nextOpen) => {
+                setOpen(nextOpen)
+                HandleDialogOpenChange(nextOpen)
+            }}
+        >
             <DialogTrigger asChild>
                 <Button variant="outline" className="ml-auto">
                     <Plus />
