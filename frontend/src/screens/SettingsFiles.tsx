@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChooseDirectory, ValidateDownloadPath } from '../../wailsjs/go/main/App'
-import { Folder } from "lucide-react"
+import { Folder, Undo2 } from "lucide-react"
 import { useAutoSaveField } from "@/hooks/use-auto-save-field"
 import { appStore } from "@/state/app-state"
 import { DEFAULT_PREFS } from "@/state/prefs"
@@ -92,6 +92,13 @@ export function SettingsFiles() {
       }
   };
 
+  const handleResetVodPath = () => {
+    form.setValue("vodPathTemplate", DEFAULT_PREFS.vod_path_template || "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
   return (
     <div className="flex">
       <Card className="w-full mx-4">
@@ -152,10 +159,21 @@ export function SettingsFiles() {
                                 {highlighted}
                               </div>
                               {/* Actual input (transparent text, visible caret) */}
-                              <Input
-                                className="relative bg-transparent text-transparent caret-[var(--foreground)]"
-                                {...field}
-                              />
+                                <div className="flex items-center">
+                                <Input
+                                  className="relative flex-1 min-w-0 bg-transparent text-transparent caret-[var(--foreground)]"
+                                  {...field}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={handleResetVodPath}
+                                  className="ml-2 h-9"
+                                >
+                                  <Undo2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                             <div />
                             <div>
