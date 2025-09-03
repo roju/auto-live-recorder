@@ -54,7 +54,7 @@ const FormSchema = z.object({
     liveURL: httpUrl.optional().or(z.literal('')),
     platform: z.custom<StreamingPlatform>(),
     username: z.string().min(1).max(32),
-    folder: z.string(),
+    folder: z.string().min(1),
     autorecord: z.boolean()
 })
 
