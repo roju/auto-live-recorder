@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -164,15 +165,22 @@ export function SettingsFiles() {
                                   className="relative flex-1 min-w-0 bg-transparent text-transparent caret-[var(--foreground)]"
                                   {...field}
                                 />
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={handleResetVodPath}
-                                  className="ml-2 h-9"
-                                >
-                                  <Undo2 className="h-4 w-4" />
-                                </Button>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={handleResetVodPath}
+                                      className="ml-2 h-9"
+                                    >
+                                      <Undo2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Reset to default</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
                             </div>
                             <div />
