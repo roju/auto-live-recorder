@@ -73,6 +73,22 @@ export function AddStreamer() {
         // Remove the filename from the template to get the directory
         .replace(/\/+$/, "")
     )
+
+    async function onSubmit(data: z.infer<typeof FormSchema>) {
+        console.log("AddStreamer form submit: ", JSON.stringify(data, null, 2))
+
+        await appStore.getState().addStreamer(new Streamer(
+            data.platform.name,
+            data.username,
+            "monitoring",
+            "unknown",
+            "unknown",
+            0,
+            data.autorecord,
+            data.folder
+        ))
+    }
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         mode: "onChange",
