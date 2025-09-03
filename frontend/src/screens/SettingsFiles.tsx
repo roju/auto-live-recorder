@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { ChooseDirectory, ValidateDownloadPath } from '../../wailsjs/go/main/App'
 import { Folder } from "lucide-react"
 import { useAutoSaveField } from "@/hooks/use-auto-save-field"
-import { loadPreferences, savePreferences } from "@/lib/preferences";
+import { appStore } from "@/state/app-state"
+import { DEFAULT_PREFS } from "@/state/prefs"
 
 const SettingsSchema = z.object({
   archiveFolder: z.string(),
@@ -42,19 +43,19 @@ function renderHighlighted(text: string) {
 }
 
 export function SettingsFiles() {
-    
-  const form = useForm({
+
+  const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: {
-      archiveFolder: "",
-      vodPathTemplate: "VODs/{platform}/{name}/{date}_{time}.mp4",
+      archiveFolder: DEFAULT_PREFS.root_folder,
+      vodPathTemplate: DEFAULT_PREFS.vod_path_template,
     },
   })
 
   useEffect(() => {
-    loadPreferences().then(prefs => {
+    appStore.getState().hydratePrefs().then(prefs => {
       if (prefs?.root_folder) {
         form.setValue("archiveFolder", prefs.root_folder)
       }
@@ -69,16 +70,12 @@ export function SettingsFiles() {
 
   useAutoSaveField(archiveFolder, (path: string) => {
       console.log("Saving archive folder:", path)
-      loadPreferences().then(prefs => {
-          savePreferences({...prefs, root_folder: path})
-      })
+      appStore.getState().persistPrefs({root_folder: path})
   })
 
   useAutoSaveField(vodPathTemplate, (tpl: string) => {
     console.log("Saving vod path template:", tpl)
-    loadPreferences().then(prefs => {
-      savePreferences({...prefs, vod_path_template: tpl})
-    })
+    appStore.getState().persistPrefs({vod_path_template: tpl})
   })
 
   const handleChooseDirectory = async () => {

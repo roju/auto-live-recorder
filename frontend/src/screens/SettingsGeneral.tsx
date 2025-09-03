@@ -2,16 +2,14 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTheme, Theme } from "@/components/theme-provider"
-import { loadPreferences, savePreferences } from "@/lib/preferences";
+import { appStore } from "../state/app-state"
 
 function SettingsGeneral() {
   const { theme, setTheme } = useTheme()
 
-  function handleChangeTheme(value: string) {
-    setTheme(value as Theme)
-    loadPreferences().then(prefs => {
-      savePreferences({...prefs, theme: value})
-    })
+  function handleChangeTheme(theme: Theme) {
+    setTheme(theme)
+    appStore.getState().persistPrefs({ theme })
   }
 
   return (

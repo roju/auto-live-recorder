@@ -1,42 +1,50 @@
 import { loadPreferences, savePreferences } from "@/lib/preferences"
 import { VisibilityState } from '@tanstack/react-table'
+import { Preferences } from '../lib/preferences'
 
 export interface PreferenceSlice {
-    dashboardColumnVis: VisibilityState
-    dashboardColumnVisHydrated: boolean
-    hydrateDashboardColumnVis: () => Promise<void>
-    persistDashboardColumnVis: (vis: VisibilityState) => Promise<void>
+    prefs: Partial<Preferences>
+    prefsHydrated: boolean
+    hydratePrefs: () => Promise<Preferences | undefined>
+    persistPrefs: (prefs: Partial<Preferences>) => Promise<void>
 }
 
 export const DEFAULT_COLUMN_VIS: VisibilityState = {
     platform: false,
-    auto_record: false,
+    auto_record: true,
     last_live: true,
     vods: true,
 }
 
+export const DEFAULT_PREFS: Partial<Preferences> = {
+    root_folder: '',
+    vod_path_template: 'VODs/{platform}/{user}/{date}_{time}.mp4',
+    dashboard_column_visibility: DEFAULT_COLUMN_VIS
+}
+
 export const createPreferenceSlice = (set: any, get: any): PreferenceSlice => ({
-    dashboardColumnVis: DEFAULT_COLUMN_VIS,
-    dashboardColumnVisHydrated: false,
-    hydrateDashboardColumnVis: async () => {
-        if (get().dashboardColumnVisHydrated) return
+    prefs: DEFAULT_PREFS,
+    prefsHydrated: false,
+    hydratePrefs: async () => {
+        if (get().prefsHydrated) return
         try {
             const prefs = await loadPreferences()
-            const vis = (prefs.dashboard_column_visibility) as VisibilityState
-            set({ dashboardColumnVis: vis})
+            console.log("Hydrated preferences:", prefs)
+            set({ prefs })
+            return prefs
         } catch (e) {
-            console.error('Error loading prefs.dashboard_column_visibility:', e)
+            console.error('Error loading preferences:', e)
         } finally {
-            set({ dashboardColumnVisHydrated: true }) // Avoid blocking UI indefinitely
+            set({ prefsHydrated: true }) // Avoid blocking UI indefinitely
         }
     },
-    persistDashboardColumnVis: async (vis: VisibilityState) => {
+    persistPrefs: async (prefs: Partial<Preferences>) => {
         try {
-            set({ dashboardColumnVis: vis })
-            const prefs = await loadPreferences()
-            await savePreferences({ ...prefs, dashboard_column_visibility: vis as any })
+            set({ prefs })
+            const currentPrefs = await loadPreferences()
+            await savePreferences({ ...currentPrefs, ...prefs })
         } catch (e) {
-            console.error('Error saving dashboard column visibility:', e)
+            console.error('Error saving preferences:', e)
         }
     },
 })

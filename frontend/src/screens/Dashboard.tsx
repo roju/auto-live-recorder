@@ -358,16 +358,17 @@ function Dashboard() {
   const [columnVisibility, setColumnVisibility] = 
     React.useState<VisibilityState>(DEFAULT_COLUMN_VIS)
   const streamerList = appStore((state) => state.streamerList)
-  const dashboardColumnVis = appStore((state) => state.dashboardColumnVis)
-  const dashboardColumnVisHydrated = appStore((state) => state.dashboardColumnVisHydrated)
+  const prefsHydrated = appStore((state) => state.prefsHydrated)
+  const persistPrefs = appStore((state) => state.persistPrefs)
   const hydrateStreamerList = appStore((state) => state.hydrateStreamerList)
-  const hydrateDashboardColumnVis = appStore((state) => state.hydrateDashboardColumnVis)
-  const persistDashboardColumnVis = appStore((state) => state.persistDashboardColumnVis)
   const removeAllStreamers = appStore((state) => state.removeAllStreamers)
   const updateAllStreamers = appStore((state) => state.updateAllStreamers)
 
   React.useEffect(() => {
-    hydrateDashboardColumnVis().then(() => setColumnVisibility(dashboardColumnVis))
+    appStore.getState().hydratePrefs().then(() => {
+      const vis = appStore.getState().prefs.dashboard_column_visibility
+      setColumnVisibility(vis as VisibilityState)
+    })
     hydrateStreamerList()
   }, [])
  
@@ -413,7 +414,7 @@ function Dashboard() {
     onColumnVisibilityChange: (updater) => {
       const nextState = (updater as any)(columnVisibility)
       setColumnVisibility(nextState)
-      persistDashboardColumnVis(nextState)
+      persistPrefs({ dashboard_column_visibility: nextState })
     },
     state: {
       sorting,
@@ -549,7 +550,7 @@ function Dashboard() {
    ██    ██   ██ ██████  ███████ ███████
 */}
       <div className="rounded-md border">
-        {dashboardColumnVisHydrated && (
+        {prefsHydrated && (
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
