@@ -34,12 +34,16 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
+import { ChooseDirectory } from '../../wailsjs/go/main/App'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { cn } from "@/lib/utils"
 import { supportedPlatforms, platformMap } from "@/data/supported-platforms"
+import { extractPlatformFromUrl } from "@/lib/utils"
 import { Streamer, StreamingPlatform } from "@/types/app-types";
+import { appStore } from "../state/app-state";
+import { useEffect, useState } from "react";
 
 const httpUrl = z.url({
   protocol: /^https?$/,
@@ -63,15 +67,35 @@ const FormSchema = z.object({
 */
 
 export function AddStreamer() {
+    var vodFolderOverride: boolean = false;
+    const vodFolderTemplate = appStore(state => 
+        `${state.prefs.root_folder}/${state.prefs.vod_path_template}`
+        // Remove the filename from the template to get the directory
+        .replace(/\/+$/, "")
+    )
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
+        mode: "onChange",
+        reValidateMode: "onChange",
         defaultValues: {
-            autorecord: true
+            autorecord: true,
+            username: "",
+            liveURL: "",
+            platform: platformMap.get("tiktok")!,
+            folder: "",
         }
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.log("form submit: ", JSON.stringify(data, null, 2))
+    useEffect(() => {
+        appStore.getState().hydratePrefs()
+    }, [])
+
+    function vodFolderPath(vodFolderTemplate: string, platform: StreamingPlatform, user: string) {
+        const lastSlash = vodFolderTemplate.lastIndexOf("/")
+        const templateDir = lastSlash !== -1 ? vodFolderTemplate.slice(0, lastSlash) : ""
+        const dirWithPlatform = templateDir.replace(/\{platform\}/g, platform.displayName)
+        const dirWithUsername = user ? dirWithPlatform.replace(/\{user\}/g, user) : dirWithPlatform
+        return dirWithUsername
     }
 
     function HandleDialogOpenChange(open: boolean) {
@@ -89,11 +113,61 @@ export function AddStreamer() {
                     shouldValidate: true,
                     shouldDirty: true,
                 });
+                vodFolderOverride = true
             }
         } catch (error) {
             console.error('Failed to choose directory:', error);
         }
     };
+
+	// Helper to update folder when username changes
+	function updateFolderForUsername(username: string) {
+        const newFolder = vodFolderPath(vodFolderTemplate, form.getValues("platform"), username);
+        if (!vodFolderOverride) {
+			form.setValue("folder", newFolder, {
+				shouldValidate: true,
+				shouldDirty: true,
+			});
+        }
+	}
+
+    function usernameFieldOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const username = e.target.value;
+        const platform = form.getValues("platform")
+        // Update the liveURL based on the username and platform
+        const newLiveUrl = username && platform ? platform.liveUrlFromUsername(username) : "" 
+
+        form.setValue("liveURL", newLiveUrl, {
+            shouldValidate: true,
+            shouldDirty: true,
+        })
+		// Update folder: {user} -> username (or back to {user} if empty)
+		updateFolderForUsername(username)
+
+        // Ensure username is re-validated immediately
+        if (username?.length >= 1) {
+            form.clearErrors("username")
+        }
+        form.trigger("username")
+    }
+
+    function liveUrlFieldOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const liveURL = e.target.value;
+        const platform = extractPlatformFromUrl(liveURL);
+        if (platform) {
+            console.log("Extracted platform:", platform.name);
+            const username = platform.usernameFromUrl(liveURL) || "";
+            console.log("Extracted username:", username);
+            form.setValue("username", username, {
+                shouldValidate: true,
+                shouldDirty: true,
+            });
+			// Also update folder based on derived username
+			updateFolderForUsername(username)
+            // Re-validate username after programmatic change
+            form.trigger("username")
+        }
+    }
 
 /*
 ██████  ███████ ████████ ██    ██ ██████  ███    ██
@@ -132,10 +206,16 @@ export function AddStreamer() {
                                     <FormLabel className="text-right">Live URL <span className="text-muted-foreground">(optional)</span></FormLabel>
                                     <FormControl>
                                         <Input
+                                            {...field}
                                             type="url"
                                             className="col-span-2"
-                                            placeholder="https://www.tiktok.com/@username/live"
-                                            {...field}
+                                            placeholder={
+                                                form.getValues("platform")?.liveUrlFromUsername("username")
+                                            }
+                                            onChange={(e) => {
+                                                field.onChange(e);
+                                                liveUrlFieldOnChange(e);
+                                            }}
                                         />
                                     </FormControl>
                                     <div className="col-span-1" />
@@ -227,13 +307,17 @@ export function AddStreamer() {
                                     <FormLabel className="text-right">Username</FormLabel>
                                     <FormControl>
                                         <Input 
+                                            {...field}
                                             type="text" 
                                             autoComplete="off"
                                             autoCorrect="off"
                                             autoCapitalize="off"
                                             className="col-span-2" 
-                                            placeholder="tv_asahi_news" 
-                                            {...field} 
+                                            placeholder="" 
+                                            onChange={(e) => {
+                                                field.onChange(e)
+                                                usernameFieldOnChange(e)
+                                            }}
                                         />
                                     </FormControl>
                                     <div className="col-span-1" />
