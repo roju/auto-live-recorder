@@ -146,9 +146,13 @@ export function SettingsFiles() {
                     control={form.control}
                     name="vodPathTemplate"
                     render={({ field }) => {
+                      const hasError = !!form.formState.errors.vodPathTemplate
                       const highlighted = useMemo(
-                        () => renderHighlighted(vodPathTemplate ?? ""),
-                        [vodPathTemplate]
+                        () => {
+                          if (hasError) return vodPathTemplate ?? ""
+                          return renderHighlighted(vodPathTemplate ?? "")
+                        },
+                        [vodPathTemplate, hasError]
                       )
                       return (
                         <FormItem className="grid grid-cols-[auto_400px] items-center gap-x-4 gap-y-2">
