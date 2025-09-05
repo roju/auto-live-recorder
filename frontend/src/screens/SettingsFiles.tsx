@@ -84,11 +84,12 @@ export function SettingsFiles() {
   const handleChooseDirectory = async () => {
       try {
           const dir = await ChooseDirectory();
-          if (dir) {
+          if (dir && appStore.getState().prefs.root_folder !== dir) {
               form.setValue("archiveFolder", dir, {
                   shouldValidate: true,
                   shouldDirty: true,
               });
+              appStore.getState().persistPrefs({root_folder: dir})
           }
       } catch (error) {
           console.error('Failed to choose directory:', error);
