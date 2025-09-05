@@ -116,7 +116,6 @@ export function AddStreamer() {
     }
 
     function HandleDialogOpenChange(open: boolean) {
-        console.log("Dialog open state changed:", open)
         if (open) {
             const defaultPlatform = platformMap.get("tiktok")!
 

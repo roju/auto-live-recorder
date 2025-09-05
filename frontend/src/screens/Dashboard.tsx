@@ -328,7 +328,6 @@ export const columns: ColumnDef<Streamer>[] = [
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => {
-                  console.log("Removing streamer:", row.original.streamerId);
                   appStore.getState().removeStreamer(row.original.streamerId)
                 }}
               >
