@@ -18,6 +18,7 @@ import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-d
 import SettingsGeneral from './screens/SettingsGeneral.tsx'
 import Dashboard from './screens/Dashboard.tsx'
 import SettingsFiles from './screens/SettingsFiles.tsx'
+import { appStore } from './state/app-state.ts'
 
 const DynamicHashBreadcrumbs = () => {
   const location = useLocation();
@@ -62,6 +63,12 @@ function AppRoutes() {
 }
 
 function App() {
+
+  React.useEffect(() => {
+    appStore.getState().hydratePrefs()
+    appStore.getState().hydrateStreamerList()
+  }, [])
+
   return (
     <HashRouter basename={"/"}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">

@@ -44,6 +44,7 @@ function renderHighlighted(text: string) {
 }
 
 export function SettingsFiles() {
+  const prefsHydrated = appStore((state) => state.prefsHydrated)
 
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
@@ -56,17 +57,17 @@ export function SettingsFiles() {
   })
 
   useEffect(() => {
-    appStore.getState().hydratePrefs().then(prefs => {
-      if (prefs?.root_folder) {
-        form.setValue("archiveFolder", prefs.root_folder)
-      }
-      if (prefs?.vod_path_template) {
-        form.setValue("vodPathTemplate", prefs.vod_path_template)
-      }
-    })
-  }, [])
+    const state = appStore.getState()
+    if (state.prefsHydrated) {
+        if (state.prefs.root_folder) {
+          form.setValue("archiveFolder", state.prefs.root_folder)
+        }
+        if (state.prefs.vod_path_template) {
+          form.setValue("vodPathTemplate", state.prefs.vod_path_template)
+        }
+    }
+  }, [prefsHydrated])
 
-  const archiveFolder = form.watch("archiveFolder")
   const vodPathTemplate = form.watch("vodPathTemplate")
 
   useAutoSaveField(vodPathTemplate, async (tpl: string) => {

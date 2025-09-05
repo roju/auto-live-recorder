@@ -358,19 +358,20 @@ function Dashboard() {
   const [columnVisibility, setColumnVisibility] = 
     React.useState<VisibilityState>(DEFAULT_COLUMN_VIS)
   const streamerList = appStore((state) => state.streamerList)
+  const [appliedColumnVisPrefs, setAppliedColumnVisPrefs] = React.useState(false)
   const prefsHydrated = appStore((state) => state.prefsHydrated)
   const persistPrefs = appStore((state) => state.persistPrefs)
-  const hydrateStreamerList = appStore((state) => state.hydrateStreamerList)
   const removeAllStreamers = appStore((state) => state.removeAllStreamers)
   const updateAllStreamers = appStore((state) => state.updateAllStreamers)
 
   React.useEffect(() => {
-    appStore.getState().hydratePrefs().then(() => {
-      const vis = appStore.getState().prefs.dashboard_column_visibility
+    const state = appStore.getState()
+    if (state.prefsHydrated && !appliedColumnVisPrefs) {
+      const vis = state.prefs.dashboard_column_visibility
       setColumnVisibility(vis as VisibilityState)
-    })
-    hydrateStreamerList()
-  }, [])
+      setAppliedColumnVisPrefs(true)
+    }
+  }, [prefsHydrated])
  
   function handleRemoveAllClicked() {
     // Close actions menu before opening dialog to avoid menu remaining open/overlaying UI
@@ -549,8 +550,8 @@ function Dashboard() {
    ██    ██   ██ ██   ██ ██      ██
    ██    ██   ██ ██████  ███████ ███████
 */}
+    {appliedColumnVisPrefs && (
       <div className="rounded-md border">
-        {prefsHydrated && (
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -596,8 +597,8 @@ function Dashboard() {
               )}
             </TableBody>
           </Table>
-        )}
       </div>
+    )}
 {/*
 ██████   █████   ██████  ███████ ███████
 ██   ██ ██   ██ ██       ██      ██
@@ -605,6 +606,7 @@ function Dashboard() {
 ██      ██   ██ ██    ██ ██           ██
 ██      ██   ██  ██████  ███████ ███████
 */}
+    {appliedColumnVisPrefs && (
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
             {currentPage} / {totalPages}
@@ -628,6 +630,7 @@ function Dashboard() {
           </Button>
         </div>
       </div>
+    )}
     </div>
   )
 }

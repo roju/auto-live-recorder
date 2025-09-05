@@ -43,7 +43,7 @@ import { supportedPlatforms, platformMap } from "@/data/supported-platforms"
 import { extractPlatformFromUrl } from "@/lib/utils"
 import { Streamer, StreamingPlatform } from "@/types/app-types";
 import { appStore } from "../state/app-state";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const httpUrl = z.url({
   protocol: /^https?$/,
@@ -106,10 +106,6 @@ export function AddStreamer() {
             folder: "",
         }
     })
-
-    useEffect(() => {
-        appStore.getState().hydratePrefs()
-    }, [])
 
     function vodFolderPath(vodFolderTemplate: string, platform: StreamingPlatform, user: string) {
         const lastSlash = vodFolderTemplate.lastIndexOf("/")
