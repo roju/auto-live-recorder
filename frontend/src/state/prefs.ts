@@ -17,6 +17,7 @@ export const DEFAULT_COLUMN_VIS: VisibilityState = {
 }
 
 export const DEFAULT_PREFS: Partial<Preferences> = {
+    theme: 'system',
     root_folder: '',
     vod_path_template: 'VODs/{platform}/{user}/{date}_{time}.mp4',
     dashboard_column_visibility: DEFAULT_COLUMN_VIS
