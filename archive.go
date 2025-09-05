@@ -31,9 +31,18 @@ var windowsReserved = map[string]struct{}{
 
 // Validates the user-supplied path without touching the filesystem.
 func (a *App) ValidateDownloadPath(downloadsDir, userInput string) (string, error) {
+	if downloadsDir == "" || userInput == "" {
+		return "", errors.New("invalid file path (must be non-empty)")
+	}
+
 	// Normalize path
-	cleaned := filepath.Clean(userInput)
-	fullPath := filepath.Join(downloadsDir, cleaned)
+	cleanedUserInput := filepath.Clean(userInput)
+	fullPath := filepath.Join(downloadsDir, cleanedUserInput)
+
+	// Ensure path is not too long
+	if len(fullPath) > 100 {
+		return "", errors.New("path is too long (max 100 chars)")
+	}
 
 	// Prevent escapes from Downloads
 	rel, err := filepath.Rel(downloadsDir, fullPath)
@@ -58,7 +67,7 @@ func (a *App) ValidateDownloadPath(downloadsDir, userInput string) (string, erro
 		return "", err
 	}
 
-	return fullPath, nil
+	return cleanedUserInput, nil
 }
 
 // Checks if filename is valid across platforms.

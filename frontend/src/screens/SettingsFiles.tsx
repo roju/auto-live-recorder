@@ -69,14 +69,15 @@ export function SettingsFiles() {
   const archiveFolder = form.watch("archiveFolder")
   const vodPathTemplate = form.watch("vodPathTemplate")
 
-  useAutoSaveField(archiveFolder, (path: string) => {
-      console.log("Saving archive folder:", path)
-      appStore.getState().persistPrefs({root_folder: path})
-  })
-
-  useAutoSaveField(vodPathTemplate, (tpl: string) => {
-    console.log("Saving vod path template:", tpl)
-    appStore.getState().persistPrefs({vod_path_template: tpl})
+  useAutoSaveField(vodPathTemplate, async (tpl: string) => {
+    if (appStore.getState().prefs.vod_path_template === tpl) return
+    try {
+      const archiveFolder = form.getValues("archiveFolder")
+      const validPath = await ValidateDownloadPath(archiveFolder, tpl)
+      appStore.getState().persistPrefs({vod_path_template: validPath})
+    } catch (error) {
+      console.log("VOD path template validation failed:", error)
+    }
   })
 
   const handleChooseDirectory = async () => {
