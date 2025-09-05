@@ -14,8 +14,8 @@ import { appStore } from "@/state/app-state"
 import { DEFAULT_PREFS } from "@/state/prefs"
 
 const SettingsSchema = z.object({
-  archiveFolder: z.string(),
-  vodPathTemplate: z.string().min(1).max(100),
+  archiveFolder: z.string().min(1),
+  vodPathTemplate: z.string().min(1),
 }).refine(
   async (data) => {
     try {
