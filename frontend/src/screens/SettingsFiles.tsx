@@ -13,23 +13,24 @@ import { useAutoSaveField } from "@/hooks/use-auto-save-field"
 import { appStore } from "@/state/app-state"
 import { DEFAULT_PREFS } from "@/state/prefs"
 
-const SettingsSchema = z.object({
-  archiveFolder: z.string().min(1),
-  vodPathTemplate: z.string().min(1),
-}).refine(
-  async (data) => {
+const SettingsSchema = z
+  .object({
+    archiveFolder: z.string().min(1),
+    vodPathTemplate: z.string().min(1),
+  })
+  .superRefine(async (data, ctx) => {
+    if (!data.archiveFolder || !data.vodPathTemplate) return
     try {
       await ValidateDownloadPath(data.archiveFolder, data.vodPathTemplate)
-      return true
-    } catch {
-      return false
+    } catch (err) {
+      const rawMessage = (err as string)?.toString().trim() || 'Invalid VOD path'
+      const message = rawMessage.charAt(0).toUpperCase() + rawMessage.slice(1)
+      ctx.addIssue({
+        message,
+        path: ['vodPathTemplate'],
+      })
     }
-  },
-  {
-    message: 'Invalid VOD path',
-    path: ['vodPathTemplate'],
-  }
-)
+  })
 
 // Highlighting regex and renderer
 const HIGHLIGHT_REGEX = /(\{(?:platform|user|date|time|title)\})/g
